@@ -1,0 +1,48 @@
+<%- include('partials/header', { title }) %>
+
+<section class="section">
+  <h1>Find Jobs</h1>
+  <p>Explore the sample vacancies currently available on Skill Nexa.</p>
+
+  <form class="search-form search-form-compact" action="/jobs" method="GET">
+    <label for="q">Search by job title, company or location</label>
+    <div class="search-controls">
+      <input id="q" name="q" type="search"
+             placeholder="e.g. Web Developer"
+             value="<%= searchTerm %>" />
+      <button type="submit">Search</button>
+      <% if (searchTerm) { %>
+        <a class="btn-clear" href="/jobs">Clear</a>
+      <% } %>
+    </div>
+  </form>
+
+  <% if (searchTerm) { %>
+    <p class="result-summary">
+      <%= jobs.length %> result(s) for "<%= searchTerm %>"
+    </p>
+  <% } else { %>
+    <p class="result-summary"><%= jobs.length %> available job(s)</p>
+  <% } %>
+
+  <% if (jobs.length > 0) { %>
+    <div class="job-grid">
+      <% jobs.forEach((job) => { %>
+        <article class="job-card">
+          <h2><a href="/jobs/<%= job.id %>"><%= job.title %></a></h2>
+          <p><strong><%= job.company %></strong></p>
+          <p><%= job.location %></p>
+          <a class="text-link" href="/jobs/<%= job.id %>">View details →</a>
+        </article>
+      <% }) %>
+    </div>
+  <% } else { %>
+    <div class="empty-state">
+      <h2>No jobs found</h2>
+      <p>Try another keyword, company name or location.</p>
+      <a href="/jobs">Show all jobs</a>
+    </div>
+  <% } %>
+</section>
+
+<%- include('partials/footer') %>

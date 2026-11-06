@@ -1,0 +1,46 @@
+<%- include('partials/header', { title }) %>
+
+<section class="hero">
+  <p class="eyebrow">Your career starts here</p>
+  <h1>Discover Your Next Career Opportunity</h1>
+  <p>Explore job vacancies and find a role that matches your skills.</p>
+
+  <form class="search-form" action="/jobs" method="GET">
+    <label for="q">Job title, company or location</label>
+    <div class="search-controls">
+      <input id="q" name="q" type="search" placeholder="e.g. Web Developer" />
+      <button type="submit">Search jobs</button>
+    </div>
+  </form>
+
+  <a class="btn-secondary" href="/jobs">Browse all available jobs</a>
+</section>
+
+<section class="section">
+  <div class="section-heading">
+    <h2>Featured opportunities</h2>
+    <a href="/jobs">View all jobs →</a>
+  </div>
+
+  <% if (jobs.length > 0) { %>
+    <div class="job-grid">
+      <% jobs.forEach((job) => { %>
+        <article class="job-card">
+          <h3><a href="/jobs/<%= job.id %>"><%= job.title %></a></h3>
+          <p><strong><%= job.company %></strong></p>
+          <p><%= job.location %></p>
+          <a class="text-link" href="/jobs/<%= job.id %>">View details</a>
+        </article>
+      <% }) %>
+    </div>
+  <% } else { %>
+    <p>No featured jobs are available right now.</p>
+  <% } %>
+</section>
+
+<section class="section" id="about">
+  <h2>About Skill Nexa</h2>
+  <p>A central place to explore career opportunities and connect with employers.</p>
+</section>
+
+<%- include('partials/footer') %>

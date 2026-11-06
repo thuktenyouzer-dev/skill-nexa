@@ -1,0 +1,10 @@
+<%- include('partials/header', { title }) %>
+
+<section class="section empty-state">
+  <p class="eyebrow">Error 404</p>
+  <h1>Job not found</h1>
+  <p>We could not find a job with ID "<%= jobId %>". It may not exist.</p>
+  <a class="btn-primary" href="/jobs">Return to job listings</a>
+</section>
+
+<%- include('partials/footer') %>

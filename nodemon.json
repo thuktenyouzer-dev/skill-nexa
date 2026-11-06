@@ -1,0 +1,12 @@
+{
+  "watch": [
+    "app.js",
+    "routes/",
+    "controllers/",
+    "views/"
+  ],
+  "ext": "js,ejs,json",
+  "ignore": [
+    "public/"
+  ]
+}

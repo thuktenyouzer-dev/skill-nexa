@@ -1,0 +1,18 @@
+APPLY THE LAB 2 FIXES
+
+1. Make a backup of your current skill-nexa folder.
+2. Extract this ZIP.
+3. Open the extracted skill-nexa folder.
+4. Copy its contents into your existing skill-nexa project folder and choose Replace for files with the same names.
+5. Delete the files listed in REMOVE_OLD_FILES.txt.
+6. Keep your existing .git folder, .env file and node_modules folder.
+7. In Git Bash, run:
+       npm run dev
+8. Refresh the browser using Ctrl + F5.
+9. Check:
+       http://localhost:3000/
+       http://localhost:3000/jobs
+       http://localhost:3000/jobs/1
+       http://localhost:3000/jobs/999
+
+The corrected archive does not include .git, .env or node_modules.
