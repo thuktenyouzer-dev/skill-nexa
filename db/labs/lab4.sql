@@ -9,16 +9,10 @@ CREATE TABLE IF NOT EXISTS applications (
     resume_url VARCHAR(500),
     cover_letter TEXT,
     status VARCHAR(20) NOT NULL DEFAULT 'submitted'
-        CHECK (
-            status IN (
-                'submitted',
-                'reviewing',
-                'shortlisted',
-                'accepted',
-                'rejected',
-                'withdrawn'
-            )
-        ),
+        CHECK (status IN (
+            'submitted', 'reviewing', 'shortlisted',
+            'accepted', 'rejected', 'withdrawn'
+        )),
     applied_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
