@@ -5,12 +5,35 @@
   <article class="job-detail">
     <p class="eyebrow">Job opportunity</p>
     <h1><%= job.title %></h1>
-    <p><strong><%= job.company %></strong></p>
-    <p><%= job.location %></p>
-    <p>
-      This is a Lab 2 demonstration vacancy. Full job descriptions,
-      qualifications and application requirements will be added in later labs.
-    </p>
+    <h2><%= job.company_name %></h2>
+    <p><strong>Location:</strong> <%= job.location %></p>
+    <p><strong>Category:</strong> <%= job.category %></p>
+    <p><strong>Employment type:</strong> <%= job.job_type %></p>
+    <p><strong>Experience level:</strong> <%= job.experience_level || 'Not specified' %></p>
+    <% if (job.salary_min != null || job.salary_max != null) { %>
+      <p><strong>Salary:</strong>
+        <%= job.salary_currency || 'BTN' %>
+        <%= job.salary_min != null ? Number(job.salary_min).toLocaleString() : 'Not specified' %>
+        –
+        <%= job.salary_max != null ? Number(job.salary_max).toLocaleString() : 'Not specified' %>
+      </p>
+    <% } %>
+    <p><strong>Application deadline:</strong> <%= job.deadline ? new Date(job.deadline).toLocaleDateString() : 'Not specified' %></p>
+
+    <div class="job-description">
+      <h3>Job description</h3>
+      <p><%= job.description %></p>
+    </div>
+
+    <% if (job.company_description) { %>
+      <div class="job-description">
+        <h3>About the company</h3>
+        <p><%= job.company_description %></p>
+      </div>
+    <% } %>
+    <% if (job.company_website) { %>
+      <p><strong>Company website:</strong> <a href="<%= job.company_website %>" target="_blank" rel="noopener noreferrer"><%= job.company_website %></a></p>
+    <% } %>
   </article>
 </section>
 

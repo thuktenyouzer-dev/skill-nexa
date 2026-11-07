@@ -1,3 +1,5 @@
+> **Updated project status:** This README describes the earlier Lab 2 checkpoint. Lab 3 Part G has since replaced the temporary in-memory job data with PostgreSQL-backed models and controllers. Follow `README_LAB3_PARTG.md` and `APPLY_LAB3_PARTG.txt` for the current project setup and verification steps.
+
 # Skill Nexa — Lab 2 checkpoint
 
 This folder contains the Skill Nexa project corrected through Lab 2 (MVC scaffolding and EJS pages).

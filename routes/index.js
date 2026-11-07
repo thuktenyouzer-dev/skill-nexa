@@ -1,9 +1,17 @@
+
 const express = require('express');
 const router = express.Router();
-const homeController = require('../controllers/homeController');
 
+const homeController = require('../controllers/homeController');
+const jobController = require('../controllers/jobController');
+
+// Homepage
 router.get('/', homeController.index);
-router.get('/jobs', homeController.jobsPage);
-router.get('/jobs/:id', homeController.jobDetails);
+
+// Job listings page
+router.get('/jobs', jobController.list);
+
+// Individual job details page
+router.get('/jobs/:id', jobController.details);
 
 module.exports = router;

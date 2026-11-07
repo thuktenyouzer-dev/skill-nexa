@@ -1,0 +1,42 @@
+APPLY THE LAB 3 PART G UPDATE
+
+IMPORTANT: Make a backup of your current skill-nexa folder first.
+
+1. Extract this ZIP.
+2. Open the extracted skill-nexa folder.
+3. Copy its files into your existing skill-nexa project folder.
+4. Choose Replace when Windows asks about files with the same names.
+5. KEEP your existing .env file. It contains your local PostgreSQL settings and password. The ZIP intentionally does not include .env.
+6. KEEP your existing .git folder. This preserves your GitHub repository connection.
+7. KEEP your existing node_modules folder. You can also run npm install if Node reports a missing package.
+8. Confirm .env has DB_PORT=1793, because your pgAdmin server connection uses port 1793.
+9. Confirm pgAdmin is connected to the skill_nexa_db database, and that db/labs/lab3.sql has already been executed there.
+10. Run npm run seed if you have not already inserted the sample companies and jobs.
+11. Run npm run dev.
+
+WHAT WAS UPDATED
+- controllers/homeController.js: homepage now reads featured, latest, popular jobs, categories and companies from PostgreSQL.
+- controllers/jobController.js: added database-driven job list/search and job detail handlers.
+- routes/index.js: connected /, /jobs and /jobs/:id to the appropriate controllers.
+- views/index.ejs: replaced Lab 2 sample-job rendering with database-driven sections.
+- views/jobs.ejs: job cards now use PostgreSQL fields and filter by keyword, location, category and job type.
+- views/job-details.ejs: details now come from the database record.
+- views/error.ejs: added a simple database/application error page.
+- app.js: added PostgreSQL connection verification output.
+- public/css/styles.css: added styling for database-driven categories, company cards and filters.
+- .env.example: documented environment variables without any real password.
+- .gitignore: corrected environment and coverage exclusions.
+
+TEST THESE URLS
+http://localhost:3000/
+http://localhost:3000/jobs
+http://localhost:3000/jobs?q=developer
+http://localhost:3000/jobs?location=Thimphu
+http://localhost:3000/jobs/1
+http://localhost:3000/jobs/999
+
+Expected terminal message when database connectivity is successful:
+PostgreSQL connection verified.
+
+NOTE
+The project files have been syntax-checked and the EJS templates have been rendered with sample test data in the packaging environment. The actual PostgreSQL database is on your computer, so final database verification must be performed locally.
