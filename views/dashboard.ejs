@@ -1,0 +1,61 @@
+<%- include('partials/header', { title }) %>
+<section class="section dashboard-heading">
+  <p class="eyebrow">Job Seeker area</p>
+  <h1>Hello, <%= profile ? profile.name : currentUser.name %></h1>
+  <p>Review your applications and keep your profile up to date.</p>
+  <% if (notice) { %><div class="notice notice-success"><%= notice %></div><% } %>
+</section>
+
+<div class="dashboard-grid">
+  <section class="panel">
+    <h2>Your profile</h2>
+    <p><strong>Email:</strong> <%= profile ? profile.email : currentUser.email %></p>
+    <p><strong>Account type:</strong> Job Seeker</p>
+    <p><strong>Email status:</strong> <span class="status status-success">Verified</span></p>
+    <form action="/dashboard/profile" method="POST" class="form-stack">
+      <div class="form-group">
+        <label for="name">Full name</label>
+        <input id="name" name="name" type="text" value="<%= profile ? profile.name : currentUser.name %>" minlength="2" maxlength="100" required />
+      </div>
+      <button type="submit">Update profile</button>
+    </form>
+  </section>
+
+  <section class="panel">
+    <div class="section-heading">
+      <h2>Your applications</h2>
+      <a href="/jobs">Find more jobs</a>
+    </div>
+    <% if (applications.length) { %>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead><tr><th>Position</th><th>Company</th><th>Applied</th><th>Status</th><th>Action</th></tr></thead>
+          <tbody>
+            <% applications.forEach((application) => { %>
+              <tr>
+                <td><%= application.job_title %></td>
+                <td><%= application.company_name %></td>
+                <td><%= new Date(application.applied_at).toLocaleDateString() %></td>
+                <td><span class="status"><%= application.status %></span></td>
+                <td>
+                  <% if (!['accepted', 'rejected', 'withdrawn'].includes(application.status)) { %>
+                    <form action="/applications/<%= application.id %>/withdraw" method="POST">
+                      <button type="submit" class="btn-small btn-danger" onclick="return confirm('Withdraw this application?')">Withdraw</button>
+                    </form>
+                  <% } else { %><span class="muted">—</span><% } %>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    <% } else { %>
+      <div class="empty-state">
+        <h3>No applications yet</h3>
+        <p>When you apply for a vacancy, it will appear here.</p>
+        <a class="btn-primary" href="/jobs">Browse vacancies</a>
+      </div>
+    <% } %>
+  </section>
+</div>
+<%- include('partials/footer') %>

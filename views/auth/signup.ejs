@@ -1,0 +1,36 @@
+<%- include('../partials/header', { title }) %>
+<section class="auth-card">
+  <p class="eyebrow">Join Skill Nexa</p>
+  <h1>Create your account</h1>
+  <p class="muted">Create a Job Seeker account to save your applications and follow your career progress.</p>
+
+  <% if (errors && errors.length) { %>
+    <div class="notice notice-error" role="alert">
+      <% errors.forEach((error) => { %><p><%= error %></p><% }); %>
+    </div>
+  <% } %>
+
+  <form action="/register" method="POST" class="form-stack">
+    <div class="form-group">
+      <label for="name">Full name</label>
+      <input id="name" name="name" type="text" maxlength="100" required autocomplete="name" value="<%= typeof formData !== 'undefined' && formData.name ? formData.name : '' %>" />
+    </div>
+    <div class="form-group">
+      <label for="email">Email address</label>
+      <input id="email" name="email" type="email" maxlength="254" required autocomplete="email" value="<%= typeof formData !== 'undefined' && formData.email ? formData.email : '' %>" />
+    </div>
+    <div class="form-group">
+      <label for="password">Password</label>
+      <input id="password" name="password" type="password" minlength="8" required autocomplete="new-password" />
+      <small>Use at least 8 characters.</small>
+    </div>
+    <div class="form-group">
+      <label for="confirm_password">Confirm password</label>
+      <input id="confirm_password" name="confirm_password" type="password" minlength="8" required autocomplete="new-password" />
+    </div>
+    <p class="small-note">All public registrations are created as Job Seeker accounts. Employer access is assigned by a Superadmin.</p>
+    <button type="submit">Create account</button>
+  </form>
+  <p class="auth-switch">Already have an account? <a href="/login">Sign in</a>.</p>
+</section>
+<%- include('../partials/footer') %>

@@ -1,0 +1,80 @@
+<%- include('partials/header', { title }) %>
+<section class="section dashboard-heading">
+  <p class="eyebrow">System management</p>
+  <h1>Superadmin dashboard</h1>
+  <p>Manage company profiles, review user accounts and assign verified Job Seekers as Employers.</p>
+  <% if (notice) { %><div class="notice notice-success"><%= notice %></div><% } %>
+</section>
+
+<section class="stats-grid">
+  <article class="stat-card"><span>Total users</span><strong><%= counts.total_users %></strong></article>
+  <article class="stat-card"><span>Job Seekers</span><strong><%= counts.total_job_seekers %></strong></article>
+  <article class="stat-card"><span>Employers</span><strong><%= counts.total_employers %></strong></article>
+  <article class="stat-card"><span>Superadmins</span><strong><%= counts.total_superadmins %></strong></article>
+</section>
+
+<section class="panel section">
+  <h2>Create a company profile</h2>
+  <form action="/superadmin/companies" method="POST" class="form-stack">
+    <div class="form-grid-two">
+      <div class="form-group"><label for="company-name">Company name</label><input id="company-name" name="name" maxlength="150" required /></div>
+      <div class="form-group"><label for="industry">Industry</label><input id="industry" name="industry" maxlength="100" required /></div>
+      <div class="form-group"><label for="company-location">Location</label><input id="company-location" name="location" maxlength="150" required /></div>
+      <div class="form-group"><label for="website">Website (optional)</label><input id="website" name="website" type="url" maxlength="300" placeholder="https://example.com" /></div>
+    </div>
+    <div class="form-group"><label for="description">Company description</label><textarea id="description" name="description" rows="4" maxlength="5000" required></textarea></div>
+    <button type="submit">Create company</button>
+  </form>
+</section>
+
+<section class="panel section">
+  <div class="section-heading"><h2>Company profiles</h2><span class="status"><%= companies.length %> total</span></div>
+  <% if (companies.length) { %>
+    <div class="table-wrap"><table class="data-table">
+      <thead><tr><th>Company</th><th>Industry</th><th>Location</th><th>Assigned Employer</th><th>Active jobs</th></tr></thead>
+      <tbody><% companies.forEach((company) => { %><tr>
+        <td><strong><%= company.name %></strong></td><td><%= company.industry %></td><td><%= company.location %></td>
+        <td><%= company.owner_name || 'Unassigned' %></td><td><%= company.active_jobs %></td>
+      </tr><% }) %></tbody>
+    </table></div>
+  <% } else { %><p class="muted">No company profiles have been created yet.</p><% } %>
+</section>
+
+<section class="panel section">
+  <div class="section-heading"><h2>User accounts</h2><span class="status"><%= users.length %> total</span></div>
+  <% if (users.length) { %>
+    <div class="table-wrap"><table class="data-table">
+      <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Verified</th><th>Company</th><th>Promote to Employer</th></tr></thead>
+      <tbody><% users.forEach((user) => { %><tr>
+        <td><%= user.name %></td><td><%= user.email %></td><td><span class="status"><%= user.role %></span></td>
+        <td><%= user.is_verified ? 'Yes' : 'No' %></td><td><%= user.company_name || '—' %></td>
+        <td>
+          <% if (user.role === 'job_seeker' && user.is_verified) { %>
+            <form class="inline-form" action="/superadmin/users/<%= user.id %>/promote" method="POST">
+              <select name="company_id" aria-label="Company for this employer" required>
+                <option value="">Choose an unassigned company</option>
+                <% companies.filter((company) => !company.owner_id).forEach((company) => { %>
+                  <option value="<%= company.id %>"><%= company.name %></option>
+                <% }) %>
+              </select>
+              <button class="btn-small" type="submit">Promote</button>
+            </form>
+          <% } else if (user.role === 'job_seeker') { %>
+            <span class="muted">Verify email first</span>
+          <% } else { %><span class="muted">—</span><% } %>
+        </td>
+      </tr><% }) %></tbody>
+    </table></div>
+  <% } else { %><p class="muted">No user accounts have been registered.</p><% } %>
+</section>
+
+<section class="panel section">
+  <div class="section-heading"><h2>Recent vacancies</h2><span class="status"><%= jobs.length %> shown</span></div>
+  <% if (jobs.length) { %>
+    <div class="table-wrap"><table class="data-table">
+      <thead><tr><th>Position</th><th>Company</th><th>Created</th><th>Status</th></tr></thead>
+      <tbody><% jobs.forEach((job) => { %><tr><td><%= job.title %></td><td><%= job.company_name %></td><td><%= new Date(job.created_at).toLocaleDateString() %></td><td><span class="status"><%= job.status %></span></td></tr><% }) %></tbody>
+    </table></div>
+  <% } else { %><p class="muted">No vacancies have been published yet.</p><% } %>
+</section>
+<%- include('partials/footer') %>

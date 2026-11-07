@@ -1,0 +1,28 @@
+<%- include('../partials/header', { title }) %>
+<section class="auth-card">
+  <p class="eyebrow">Welcome back</p>
+  <h1>Sign in to Skill Nexa</h1>
+  <p class="muted">Use your verified email address and password.</p>
+
+  <% if (errors && errors.length) { %>
+    <div class="notice notice-error" role="alert">
+      <% errors.forEach((error) => { %><p><%= error %></p><% }); %>
+    </div>
+  <% } %>
+
+  <form action="/login" method="POST" class="form-stack">
+    <div class="form-group">
+      <label for="email">Email address</label>
+      <input id="email" name="email" type="email" maxlength="254" required autocomplete="email" />
+    </div>
+    <div class="form-group">
+      <label for="password">Password</label>
+      <input id="password" name="password" type="password" required autocomplete="current-password" />
+    </div>
+    <div class="form-row-between"><a href="/forgot-password">Forgot password?</a></div>
+  <p class="small-note">Did not receive your verification email? <a href="/resend-verification">Resend verification link</a>.</p>
+    <button type="submit">Sign in</button>
+  </form>
+  <p class="auth-switch">New to Skill Nexa? <a href="/register">Create an account</a>.</p>
+</section>
+<%- include('../partials/footer') %>

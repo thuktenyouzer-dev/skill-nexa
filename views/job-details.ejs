@@ -34,6 +34,33 @@
     <% if (job.company_website) { %>
       <p><strong>Company website:</strong> <a href="<%= job.company_website %>" target="_blank" rel="noopener noreferrer"><%= job.company_website %></a></p>
     <% } %>
+
+    <% if (notice) { %><div class="notice notice-success"><%= notice %></div><% } %>
+
+    <% if (currentUser && currentUser.role === 'job_seeker') { %>
+      <div class="application-box">
+        <h2>Apply for this position</h2>
+        <p>Your name and email will be taken from your verified Skill Nexa account.</p>
+        <form action="/jobs/<%= job.id %>/apply" method="POST" class="form-stack">
+          <div class="form-group">
+            <label for="resume_url">Resume link (optional)</label>
+            <input id="resume_url" name="resume_url" type="url" maxlength="500" placeholder="https://example.com/my-resume.pdf" />
+          </div>
+          <div class="form-group">
+            <label for="cover_letter">Cover letter (optional)</label>
+            <textarea id="cover_letter" name="cover_letter" rows="5" maxlength="5000" placeholder="Tell the employer why you are interested in this role."></textarea>
+          </div>
+          <button type="submit">Submit application</button>
+        </form>
+      </div>
+    <% } else if (!currentUser) { %>
+      <div class="application-box">
+        <h2>Interested in this position?</h2>
+        <p><a href="/login">Sign in as a Job Seeker</a> to submit an application.</p>
+      </div>
+    <% } else { %>
+      <div class="application-box"><p>Only Job Seeker accounts can apply for vacancies.</p></div>
+    <% } %>
   </article>
 </section>
 

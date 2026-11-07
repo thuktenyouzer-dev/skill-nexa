@@ -1,48 +1,41 @@
-
-// Check whether the user is logged in
+// Browser authentication middleware.
 function requireAuth(req, res, next) {
-    if (!req.session?.user) {
+    if (!req.session || !req.session.user) {
         return res.redirect('/login');
     }
-
-    next();
+    return next();
 }
 
-// Check the user's role
+// Protect a page or action for one specific role.
 function requireRole(role) {
     return function roleGuard(req, res, next) {
-        if (!req.session?.user) {
+        if (!req.session || !req.session.user) {
             return res.redirect('/login');
         }
 
         if (req.session.user.role !== role) {
             return res.status(403).render('403', {
-                title: 'Access denied'
+                title: 'Access denied',
+                message: 'Your account does not have permission to open this page.'
             });
         }
 
-        next();
+        return next();
     };
 }
 
-// API authentication
+// API requests receive JSON errors rather than browser redirects.
 function requireAuthApi(req, res, next) {
-    if (!req.session?.user) {
-        return res.status(401).json({
-            error: 'Authentication is required.'
-        });
+    if (!req.session || !req.session.user) {
+        return res.status(401).json({ error: 'Authentication is required.' });
     }
-
-    next();
+    return next();
 }
 
-// API role authentication
 function requireRoleApi(role) {
     return function apiRoleGuard(req, res, next) {
-        if (!req.session?.user) {
-            return res.status(401).json({
-                error: 'Authentication is required.'
-            });
+        if (!req.session || !req.session.user) {
+            return res.status(401).json({ error: 'Authentication is required.' });
         }
 
         if (req.session.user.role !== role) {
@@ -51,7 +44,7 @@ function requireRoleApi(role) {
             });
         }
 
-        next();
+        return next();
     };
 }
 

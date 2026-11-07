@@ -1,0 +1,12 @@
+<%- include('../partials/header', { title }) %>
+<section class="auth-card centered-card">
+  <p class="eyebrow"><%= success ? 'Email verification' : 'Verification problem' %></p>
+  <h1><%= success ? 'Your email is verified' : 'Verification link unavailable' %></h1>
+  <p><%= message %></p>
+  <% if (success) { %>
+    <a class="btn-primary" href="/login">Sign in</a>
+  <% } else { %>
+    <a class="btn-secondary" href="/register">Create another account</a>
+  <% } %>
+</section>
+<%- include('../partials/footer') %>

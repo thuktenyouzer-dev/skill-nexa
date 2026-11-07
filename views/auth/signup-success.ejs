@@ -1,0 +1,10 @@
+<%- include('../partials/header', { title }) %>
+<section class="auth-card centered-card">
+  <p class="eyebrow">One more step</p>
+  <h1>Check your email</h1>
+  <p>Your Skill Nexa account has been created for <strong><%= email %></strong>.</p>
+  <p>Open the verification link sent to your email address before signing in.</p>
+  <p class="small-note">During local development, when Gmail is not configured, the verification link is printed in the terminal running the application.</p>
+  <a class="btn-primary" href="/login">Go to sign in</a>
+</section>
+<%- include('../partials/footer') %>

@@ -52,6 +52,16 @@ async function verifyEmail(tokenHash) {
     );
 }
 
+// Replace the verification token when an unverified user requests another email.
+async function saveVerificationToken(userId, tokenHash) {
+    return db.none(
+        `UPDATE users
+         SET verification_token = $1
+         WHERE id = $2 AND is_verified = false`,
+        [tokenHash, userId]
+    );
+}
+
 // Save password reset token
 async function savePasswordResetToken(userId, tokenHash, expiresAt) {
     return db.none(
@@ -123,7 +133,7 @@ async function getCounts() {
 async function promoteToEmployer(userId, companyId) {
     return db.tx(async (t) => {
         const user = await t.oneOrNone(
-            'SELECT id, role FROM users WHERE id = $1 FOR UPDATE',
+            'SELECT id, role, is_verified FROM users WHERE id = $1 FOR UPDATE',
             [userId]
         );
 
@@ -136,8 +146,12 @@ async function promoteToEmployer(userId, companyId) {
             throw new Error('User or company was not found.');
         }
 
-        if (user.role === 'superadmin') {
-            throw new Error('A superadmin cannot be changed into an employer.');
+        if (user.role !== 'job_seeker') {
+            throw new Error('Only a Job Seeker account can be promoted to Employer.');
+        }
+
+        if (!user.is_verified) {
+            throw new Error('The user must verify their email address before promotion.');
         }
 
         if (
@@ -180,6 +194,7 @@ module.exports = {
     findById,
     verifyPassword,
     verifyEmail,
+    saveVerificationToken,
     savePasswordResetToken,
     findByValidResetToken,
     updatePassword,

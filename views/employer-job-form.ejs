@@ -1,0 +1,31 @@
+<%- include('partials/header', { title }) %>
+<section class="auth-card auth-card-wide">
+  <p class="eyebrow">Employer area</p>
+  <h1><%= heading %></h1>
+  <p class="muted">Enter the vacancy details. The vacancy will be linked to the company assigned to your account.</p>
+  <% if (errors && errors.length) { %>
+    <div class="notice notice-error" role="alert"><% errors.forEach((error) => { %><p><%= error %></p><% }); %></div>
+  <% } %>
+  <form action="<%= action %>" method="POST" class="form-stack">
+    <div class="form-group"><label for="title">Job title</label><input id="title" name="title" maxlength="140" value="<%= job.title || '' %>" required /></div>
+    <div class="form-group"><label for="description">Job description</label><textarea id="description" name="description" rows="6" maxlength="10000" required><%= job.description || '' %></textarea></div>
+    <div class="form-grid-two">
+      <div class="form-group"><label for="category">Category</label><input id="category" name="category" maxlength="80" value="<%= job.category || '' %>" required /></div>
+      <div class="form-group"><label for="location">Location</label><input id="location" name="location" maxlength="120" value="<%= job.location || '' %>" required /></div>
+      <div class="form-group">
+        <label for="job_type">Employment type</label>
+        <select id="job_type" name="job_type" required>
+          <option value="">Choose a type</option>
+          <% jobTypes.forEach((type) => { %><option value="<%= type %>" <%= job.job_type === type ? 'selected' : '' %>><%= type %></option><% }) %>
+        </select>
+      </div>
+      <div class="form-group"><label for="experience_level">Experience level</label><input id="experience_level" name="experience_level" maxlength="80" value="<%= job.experience_level || 'Not specified' %>" /></div>
+      <div class="form-group"><label for="salary_min">Minimum salary</label><input id="salary_min" name="salary_min" type="number" min="0" step="0.01" value="<%= job.salary_min == null ? '' : job.salary_min %>" /></div>
+      <div class="form-group"><label for="salary_max">Maximum salary</label><input id="salary_max" name="salary_max" type="number" min="0" step="0.01" value="<%= job.salary_max == null ? '' : job.salary_max %>" /></div>
+      <div class="form-group"><label for="salary_currency">Salary currency</label><input id="salary_currency" name="salary_currency" maxlength="8" value="<%= job.salary_currency || 'BTN' %>" /></div>
+      <div class="form-group"><label for="deadline">Application deadline</label><input id="deadline" name="deadline" type="date" value="<%= job.deadline ? String(job.deadline).slice(0, 10) : '' %>" /></div>
+    </div>
+    <div class="search-controls"><button type="submit">Save vacancy</button><a class="btn-secondary" href="/employer">Cancel</a></div>
+  </form>
+</section>
+<%- include('partials/footer') %>

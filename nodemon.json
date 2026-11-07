@@ -3,10 +3,12 @@
     "app.js",
     "routes/",
     "controllers/",
+    "models/",
+    "middleware/",
+    "config/",
+    "utils/",
     "views/"
   ],
   "ext": "js,ejs,json",
-  "ignore": [
-    "public/"
-  ]
+  "ignore": ["public/", "node_modules/"]
 }

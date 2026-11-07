@@ -1,0 +1,8 @@
+<%- include('partials/header', { title }) %>
+<section class="section empty-state">
+  <p class="eyebrow">403 - Access denied</p>
+  <h1>You do not have access to this page</h1>
+  <p><%= typeof message !== 'undefined' ? message : 'Your account does not have permission to perform this action.' %></p>
+  <a class="btn-primary" href="/">Return to homepage</a>
+</section>
+<%- include('partials/footer') %>

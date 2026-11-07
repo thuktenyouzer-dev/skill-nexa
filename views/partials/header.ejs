@@ -3,6 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#3154c9" />
     <title><%= title %> | Skill Nexa</title>
     <link rel="stylesheet" href="/css/styles.css" />
   </head>
@@ -13,6 +14,21 @@
         <a href="/">Home</a>
         <a href="/jobs">Find Jobs</a>
         <a href="/#about">About</a>
+        <% if (currentUser) { %>
+          <% if (currentUser.role === 'superadmin') { %>
+            <a href="/superadmin">Dashboard</a>
+          <% } else if (currentUser.role === 'employer') { %>
+            <a href="/employer">Dashboard</a>
+          <% } else { %>
+            <a href="/dashboard">Dashboard</a>
+          <% } %>
+          <form class="nav-logout" action="/logout" method="POST">
+            <button class="nav-button" type="submit">Log out</button>
+          </form>
+        <% } else { %>
+          <a href="/login">Log in</a>
+          <a class="nav-register" href="/register">Create account</a>
+        <% } %>
       </nav>
     </header>
     <main class="container">
