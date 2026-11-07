@@ -1,0 +1,196 @@
+
+<%- include('partials/header', { title }) %>
+
+<div class="container">
+
+    <!-- Company Information -->
+    <section class="job-detail">
+
+        <h1><%= company.name %></h1>
+
+        <p>
+            <strong>Industry:</strong>
+            <%= company.industry || 'Not specified' %>
+        </p>
+
+        <p>
+            <strong>Location:</strong>
+            <%= company.location || 'Not specified' %>
+        </p>
+
+        <p>
+            <strong>Description:</strong>
+            <%= company.description || 'No description available.' %>
+        </p>
+
+        <% if (company.website) { %>
+            <p>
+                <strong>Website:</strong>
+                <a href="<%= company.website %>" target="_blank" rel="noopener noreferrer">
+                    Visit company website
+                </a>
+            </p>
+        <% } %>
+
+        <% if (notice) { %>
+            <p class="notice"><%= notice %></p>
+        <% } %>
+
+    </section>
+
+
+    <!-- Available Company Jobs -->
+    <section>
+
+        <h2>Available Jobs</h2>
+
+        <% if (jobs.length > 0) { %>
+
+            <% jobs.forEach((job) => { %>
+
+                <article class="job-card">
+
+                    <h3>
+                        <a href="/jobs/<%= job.id %>">
+                            <%= job.title %>
+                        </a>
+                    </h3>
+
+                    <p>
+                        <%= job.location %>
+                    </p>
+
+                    <p>
+                        Employment Type:
+                        <%= job.job_type %>
+                    </p>
+
+                    <a href="/jobs/<%= job.id %>">
+                        View Job Details
+                    </a>
+
+                </article>
+
+            <% }) %>
+
+        <% } else { %>
+
+            <p>No available vacancies at the moment.</p>
+
+        <% } %>
+
+    </section>
+
+
+    <!-- Company Reviews -->
+    <section>
+
+        <h2>Company Reviews</h2>
+
+        <% if (reviews.length > 0) { %>
+
+            <% reviews.forEach((review) => { %>
+
+                <article class="job-card">
+
+                    <h3><%= review.reviewerName %></h3>
+
+                    <p>
+                        <strong>Rating:</strong>
+                        <%= review.rating %> / 5
+                    </p>
+
+                    <p>
+                        <%= review.comment %>
+                    </p>
+
+                    <small>
+                        Reviewed on:
+                        <%= new Date(review.createdAt).toLocaleDateString() %>
+                    </small>
+
+                </article>
+
+            <% }) %>
+
+        <% } else { %>
+
+            <p>No reviews have been submitted yet.</p>
+
+        <% } %>
+
+    </section>
+
+
+    <!-- Review Submission Form -->
+    <section class="job-detail">
+
+        <% if (currentUser && currentUser.role === 'job_seeker') { %>
+
+            <h2>Write a Company Review</h2>
+
+            <form
+                action="/companies/<%= company.id %>/reviews"
+                method="POST"
+            >
+
+                <div>
+                    <label for="rating">Select Rating</label>
+
+                    <select id="rating" name="rating" required>
+
+                        <option value="">Choose a rating</option>
+                        <option value="5">5 - Excellent</option>
+                        <option value="4">4 - Good</option>
+                        <option value="3">3 - Average</option>
+                        <option value="2">2 - Poor</option>
+                        <option value="1">1 - Very Poor</option>
+
+                    </select>
+                </div>
+
+                <br>
+
+                <div>
+                    <label for="comment">Write Your Review</label>
+
+                    <textarea
+                        id="comment"
+                        name="comment"
+                        rows="5"
+                        minlength="5"
+                        maxlength="2000"
+                        placeholder="Share your experience with this company..."
+                        required
+                    ></textarea>
+                </div>
+
+                <br>
+
+                <button type="submit">
+                    Submit Review
+                </button>
+
+            </form>
+
+        <% } else if (!currentUser) { %>
+
+            <h3>Want to Review This Company?</h3>
+
+            <p>Please sign in as a Job Seeker to submit a review.</p>
+
+            <a href="/login">Sign In</a>
+
+        <% } else { %>
+
+            <p>
+                Only Job Seekers can submit company reviews.
+            </p>
+
+        <% } %>
+
+    </section>
+
+</div>
+
+<%- include('partials/footer') %>

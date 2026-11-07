@@ -74,11 +74,38 @@ function validateApplication(input) {
 
     return errors;
 }
+// Validate company review information for Lab 8
+function validateReview(input) {
+    const errors = [];
 
+    const rating = Number(input.rating);
+    const comment = typeof input.comment === 'string'
+        ? input.comment.trim()
+        : '';
+
+    // Rating must be between 1 and 5
+    if (!Number.isInteger(rating) || rating < 1 || rating > 5) {
+        errors.push('Rating must be between 1 and 5.');
+    }
+
+    // Comment must contain at least 5 characters
+    if (comment.length < 5) {
+        errors.push('Comment must contain at least 5 characters.');
+    }
+
+    // Limit comment length
+    if (comment.length > 2000) {
+        errors.push('Comment cannot exceed 2000 characters.');
+    }
+
+    return errors;
+}
+// Export validation functions
 // Export validation functions
 module.exports = {
     cleanString,
     isValidEmail,
     validateRegistration,
-    validateApplication
+    validateApplication,
+    validateReview
 };

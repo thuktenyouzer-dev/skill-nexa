@@ -1,32 +1,61 @@
+
 <%- include('partials/header', { title }) %>
+
 <section class="section dashboard-heading">
   <p class="eyebrow">Employer area</p>
   <h1><%= company.name %> dashboard</h1>
   <p>Manage vacancies and review applications submitted to your company.</p>
-  <% if (notice) { %><div class="notice notice-success"><%= notice %></div><% } %>
+
+  <% if (notice) { %>
+    <div class="notice notice-success"><%= notice %></div>
+  <% } %>
+
   <a class="btn-primary" href="/employer/jobs/new">Post a vacancy</a>
+  <a class="btn-primary" href="/employer/reviews">View Company Reviews</a>
 </section>
 
 <section class="panel section">
-  <div class="section-heading"><h2>Your vacancies</h2><span class="status"><%= jobs.length %> total</span></div>
+  <div class="section-heading">
+    <h2>Your vacancies</h2>
+    <span class="status"><%= jobs.length %> total</span>
+  </div>
+
   <% if (jobs.length) { %>
     <div class="table-wrap">
       <table class="data-table">
-        <thead><tr><th>Position</th><th>Location</th><th>Type</th><th>Status</th><th>Actions</th></tr></thead>
+        <thead>
+          <tr>
+            <th>Position</th>
+            <th>Location</th>
+            <th>Type</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+
         <tbody>
           <% jobs.forEach((job) => { %>
             <tr>
               <td><strong><%= job.title %></strong></td>
               <td><%= job.location %></td>
               <td><%= job.job_type %></td>
-              <td><span class="status <%= job.is_active ? 'status-success' : 'status-muted' %>"><%= job.status %></span></td>
+              <td>
+                <span class="status <%= job.is_active ? 'status-success' : 'status-muted' %>">
+                  <%= job.status %>
+                </span>
+              </td>
+
               <td class="table-actions">
                 <% if (job.is_active) { %>
                   <a class="text-link" href="/employer/jobs/<%= job.id %>/edit">Edit</a>
-                  <form action="/employer/jobs/<%= job.id %>/close" method="POST" onsubmit="return confirm('Close this vacancy?')">
+
+                  <form action="/employer/jobs/<%= job.id %>/close" method="POST"
+                    onsubmit="return confirm('Close this vacancy?')">
                     <button type="submit" class="btn-small btn-danger">Close</button>
                   </form>
-                <% } else { %><span class="muted">Closed</span><% } %>
+                <% } else { %>
+                  <span class="muted">Closed</span>
+                <% } %>
               </td>
             </tr>
           <% }) %>
@@ -34,16 +63,33 @@
       </table>
     </div>
   <% } else { %>
-    <div class="empty-state"><h3>No vacancies posted</h3><p>Create your first vacancy to start receiving applications.</p></div>
+    <div class="empty-state">
+      <h3>No vacancies posted</h3>
+      <p>Create your first vacancy to start receiving applications.</p>
+    </div>
   <% } %>
 </section>
 
 <section class="panel section">
-  <div class="section-heading"><h2>Applications received</h2><span class="status"><%= applications.length %> total</span></div>
+  <div class="section-heading">
+    <h2>Applications received</h2>
+    <span class="status"><%= applications.length %> total</span>
+  </div>
+
   <% if (applications.length) { %>
     <div class="table-wrap">
       <table class="data-table">
-        <thead><tr><th>Applicant</th><th>Position</th><th>Email</th><th>Applied</th><th>Status</th><th>Update status</th></tr></thead>
+        <thead>
+          <tr>
+            <th>Applicant</th>
+            <th>Position</th>
+            <th>Email</th>
+            <th>Applied</th>
+            <th>Status</th>
+            <th>Update status</th>
+          </tr>
+        </thead>
+
         <tbody>
           <% applications.forEach((application) => { %>
             <tr>
@@ -51,14 +97,24 @@
               <td><%= application.job_title %></td>
               <td><%= application.applicant_email %></td>
               <td><%= new Date(application.applied_at).toLocaleDateString() %></td>
-              <td><span class="status"><%= application.status %></span></td>
               <td>
-                <form class="inline-form" action="/employer/applications/<%= application.id %>/status" method="POST">
+                <span class="status"><%= application.status %></span>
+              </td>
+
+              <td>
+                <form class="inline-form"
+                  action="/employer/applications/<%= application.id %>/status"
+                  method="POST">
+
                   <select name="status" aria-label="Application status">
                     <% ['reviewing', 'shortlisted', 'accepted', 'rejected'].forEach((status) => { %>
-                      <option value="<%= status %>" <%= application.status === status ? 'selected' : '' %>><%= status %></option>
+                      <option value="<%= status %>"
+                        <%= application.status === status ? 'selected' : '' %>>
+                        <%= status %>
+                      </option>
                     <% }) %>
                   </select>
+
                   <button type="submit" class="btn-small">Save</button>
                 </form>
               </td>
@@ -68,7 +124,10 @@
       </table>
     </div>
   <% } else { %>
-    <div class="empty-state"><p>No applications have been received for your vacancies yet.</p></div>
+    <div class="empty-state">
+      <p>No applications have been received for your vacancies yet.</p>
+    </div>
   <% } %>
 </section>
+
 <%- include('partials/footer') %>

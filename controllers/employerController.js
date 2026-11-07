@@ -1,6 +1,8 @@
+
 const Company = require('../models/Company');
 const Job = require('../models/Job');
 const Application = require('../models/Application');
+const CompanyReview = require('../models/CompanyReview');
 const { cleanString } = require('../utils/validators');
 
 const ALLOWED_JOB_TYPES = ['Full-time', 'Part-time', 'Contract', 'Internship', 'Temporary'];
@@ -35,20 +37,25 @@ function validateJobInput(input) {
     if (!input.category) errors.push('Please enter a job category.');
     if (!input.location) errors.push('Please enter the job location.');
     if (!ALLOWED_JOB_TYPES.includes(input.job_type)) errors.push('Choose a valid employment type.');
+
     if (input.salary_min !== null && (!Number.isFinite(input.salary_min) || input.salary_min < 0)) {
         errors.push('Minimum salary must be a valid non-negative number.');
     }
+
     if (input.salary_max !== null && (!Number.isFinite(input.salary_max) || input.salary_max < 0)) {
         errors.push('Maximum salary must be a valid non-negative number.');
     }
+
     if (input.salary_min !== null && input.salary_max !== null && input.salary_max < input.salary_min) {
         errors.push('Maximum salary cannot be lower than minimum salary.');
     }
+
     if (input.deadline) {
         const parsedDate = new Date(`${input.deadline}T00:00:00Z`);
         const isValidDate = /^\d{4}-\d{2}-\d{2}$/.test(input.deadline)
             && !Number.isNaN(parsedDate.getTime())
             && parsedDate.toISOString().slice(0, 10) === input.deadline;
+
         if (!isValidDate) errors.push('Choose a valid application deadline.');
     }
 
@@ -70,7 +77,7 @@ function renderJobForm(res, { title, heading, action, job, errors = [] }, status
     });
 }
 
-// Employer dashboard: every displayed resource belongs to the signed-in employer's company.
+// Employer dashboard: resources belong to the signed-in employer's company.
 exports.dashboard = async (req, res) => {
     const company = await findEmployerCompany(req.session.user.id);
 
@@ -97,6 +104,7 @@ exports.dashboard = async (req, res) => {
 
 exports.getNewJob = async (req, res) => {
     const company = await findEmployerCompany(req.session.user.id);
+
     if (!company) {
         return res.status(403).render('403', {
             title: 'Company not assigned',
@@ -114,6 +122,7 @@ exports.getNewJob = async (req, res) => {
 
 exports.createJob = async (req, res) => {
     const company = await findEmployerCompany(req.session.user.id);
+
     if (!company) {
         return res.status(403).render('403', {
             title: 'Company not assigned',
@@ -123,6 +132,7 @@ exports.createJob = async (req, res) => {
 
     const input = getJobInput(req.body);
     const errors = validateJobInput(input);
+
     if (errors.length) {
         return renderJobForm(res, {
             title: 'Post a vacancy',
@@ -139,6 +149,7 @@ exports.createJob = async (req, res) => {
 
 exports.getEditJob = async (req, res) => {
     const company = await findEmployerCompany(req.session.user.id);
+
     if (!company) {
         return res.status(403).render('403', {
             title: 'Company not assigned',
@@ -167,6 +178,7 @@ exports.getEditJob = async (req, res) => {
 
 exports.updateJob = async (req, res) => {
     const company = await findEmployerCompany(req.session.user.id);
+
     if (!company) {
         return res.status(403).render('403', {
             title: 'Company not assigned',
@@ -175,6 +187,7 @@ exports.updateJob = async (req, res) => {
     }
 
     const jobId = Number(req.params.id);
+
     if (!Number.isSafeInteger(jobId) || jobId < 1) {
         return res.status(404).render('error', {
             title: 'Vacancy not found',
@@ -184,6 +197,7 @@ exports.updateJob = async (req, res) => {
 
     const input = getJobInput(req.body);
     const errors = validateJobInput(input);
+
     if (errors.length) {
         return renderJobForm(res, {
             title: 'Edit vacancy',
@@ -195,6 +209,7 @@ exports.updateJob = async (req, res) => {
     }
 
     const updated = await Job.updateJob(jobId, company.id, input);
+
     if (!updated) {
         return res.status(404).render('error', {
             title: 'Vacancy not found',
@@ -207,6 +222,7 @@ exports.updateJob = async (req, res) => {
 
 exports.closeJob = async (req, res) => {
     const company = await findEmployerCompany(req.session.user.id);
+
     if (!company) {
         return res.status(403).render('403', {
             title: 'Company not assigned',
@@ -215,10 +231,16 @@ exports.closeJob = async (req, res) => {
     }
 
     const jobId = Number(req.params.id);
+
     if (!Number.isSafeInteger(jobId) || jobId < 1) {
-        return res.status(404).render('error', { title: 'Vacancy not found', message: 'The requested vacancy could not be found.' });
+        return res.status(404).render('error', {
+            title: 'Vacancy not found',
+            message: 'The requested vacancy could not be found.'
+        });
     }
+
     const closed = await Job.closeJob(jobId, company.id);
+
     if (!closed) {
         return res.status(404).render('error', {
             title: 'Vacancy not found',
@@ -231,6 +253,7 @@ exports.closeJob = async (req, res) => {
 
 exports.updateApplicationStatus = async (req, res) => {
     const company = await findEmployerCompany(req.session.user.id);
+
     if (!company) {
         return res.status(403).render('403', {
             title: 'Company not assigned',
@@ -239,16 +262,22 @@ exports.updateApplicationStatus = async (req, res) => {
     }
 
     const applicationId = Number(req.params.id);
+
     if (!Number.isSafeInteger(applicationId) || applicationId < 1) {
-        return res.status(404).render('error', { title: 'Application not found', message: 'The requested application could not be found.' });
+        return res.status(404).render('error', {
+            title: 'Application not found',
+            message: 'The requested application could not be found.'
+        });
     }
 
     const status = cleanString(req.body.status, 20);
+
     if (!ALLOWED_APPLICATION_STATUSES.includes(status)) {
         return res.redirect('/employer?notice=Choose%20a%20valid%20application%20status.');
     }
 
     const updated = await Application.updateStatus(applicationId, company.id, status);
+
     if (!updated) {
         return res.status(404).render('error', {
             title: 'Application not found',
@@ -257,4 +286,24 @@ exports.updateApplicationStatus = async (req, res) => {
     }
 
     return res.redirect('/employer?notice=Application%20status%20updated.');
+};
+
+// Lab 8: Display reviews for the signed-in Employer's own company.
+exports.reviews = async (req, res) => {
+    const company = await findEmployerCompany(req.session.user.id);
+
+    if (!company) {
+        return res.status(403).render('403', {
+            title: 'Company not assigned',
+            message: 'A Superadmin must assign a company to this Employer account first.'
+        });
+    }
+
+    const reviews = await CompanyReview.getByCompany(company.id);
+
+    return res.render('employer-reviews', {
+        title: 'Company reviews',
+        company,
+        reviews
+    });
 };

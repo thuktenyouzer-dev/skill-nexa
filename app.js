@@ -5,6 +5,13 @@ const path = require('path');
 require('dotenv').config();
 
 const db = require('./config/db');
+
+// LAB 8: MongoDB connection
+const {
+    connectMongo,
+    closeMongo
+} = require('./config/mongo');
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -26,7 +33,7 @@ app.use(express.json({
     limit: '30kb'
 }));
 
-// LAB 7 PART E: Configure user sessions.
+// LAB 7: Configure user sessions.
 app.use(session({
     name: 'skillnexa.sid',
     secret: process.env.SESSION_SECRET || 'development-only-change-this-secret',
@@ -40,9 +47,13 @@ app.use(session({
     }
 }));
 
-// Make the signed-in user available to every EJS page (navigation, buttons and role labels).
+// Make the signed-in user available to every EJS page.
 app.use((req, res, next) => {
-    res.locals.currentUser = req.session && req.session.user ? req.session.user : null;
+    res.locals.currentUser =
+        req.session && req.session.user
+            ? req.session.user
+            : null;
+
     next();
 });
 
@@ -68,22 +79,66 @@ app.use((error, req, res, next) => {
     });
 });
 
-// Start the server.
-const server = app.listen(PORT, () => {
-    console.log(`Skill Nexa running at http://localhost:${PORT}`);
-});
+// Start the server after connecting the databases.
+async function startServer() {
 
-// Verify PostgreSQL connection.
-db.connect()
-    .then((connection) => {
-        connection.done();
+    try {
+
+        // Verify PostgreSQL connection.
+        await db.one('SELECT 1');
+
         console.log('PostgreSQL connection verified.');
-    })
-    .catch((error) => {
+
+        // Connect to MongoDB Atlas.
+        const mongoDatabase = await connectMongo();
+
+        if (mongoDatabase) {
+            console.log('MongoDB connection verified.');
+        } else {
+            console.warn('MongoDB is not configured. Company reviews are unavailable.');
+        }
+
+        // Start the website.
+        const server = app.listen(PORT, () => {
+            console.log(`Skill Nexa running at http://localhost:${PORT}`);
+        });
+
+        // Close database connections when the server stops.
+        const shutdown = () => {
+
+            console.log('Shutting down Skill Nexa...');
+
+            server.close(async () => {
+
+                try {
+                    await closeMongo();
+                    await db.$pool.end();
+
+                } catch (error) {
+                    console.error('Shutdown error:', error.message);
+                }
+
+                process.exit(0);
+            });
+        };
+
+        process.on('SIGINT', shutdown);
+        process.on('SIGTERM', shutdown);
+
+    } catch (error) {
+
         console.error(
-            'PostgreSQL connection could not be verified:',
+            'Unable to start Skill Nexa:',
             error.message
         );
-    });
+
+        process.exit(1);
+    }
+}
+
+// Run the server when app.js is executed directly.
+if (require.main === module) {
+    startServer();
+}
 
 module.exports = app;
