@@ -14,11 +14,21 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Read data submitted by HTML forms.
-app.use(express.urlencoded({ extended: false }));
+app.use(express.urlencoded({
+    extended: false,
+    limit: '30kb'
+}));
+
+app.use(express.json({
+    limit: '30kb'
+}));
 
 // Connect the website routes.
 const indexRoutes = require('./routes/index');
 app.use('/', indexRoutes);
+const apiRoutes = require('./routes/api');
+app.use('/api', apiRoutes);
+
 
 // Display a useful message when a database-backed page fails.
 app.use((error, req, res, next) => {
