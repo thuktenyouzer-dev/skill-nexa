@@ -1,39 +1,30 @@
 
-const session = require('express-session');
-const express = require('express');
-const path = require('path');
 require('dotenv').config();
 
-const db = require('./config/db');
+const express = require('express');
+const path = require('path');
+const session = require('express-session');
 
-// LAB 8: MongoDB connection
-const {
-    connectMongo,
-    closeMongo
-} = require('./config/mongo');
+const indexRoutes = require('./routes/index');
+const apiRoutes = require('./routes/api');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
 
-// Configure EJS templates.
+// Trust proxy in production
+if (process.env.NODE_ENV === 'production') {
+    app.set('trust proxy', 1);
+}
+
+// View engine configuration
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
-// Serve CSS, JavaScript and image files from public/.
+// Middleware
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.urlencoded({ extended: false, limit: '30kb' }));
+app.use(express.json({ limit: '30kb' }));
 
-// Read data submitted by HTML forms.
-app.use(express.urlencoded({
-    extended: false,
-    limit: '30kb'
-}));
-
-// Read JSON requests.
-app.use(express.json({
-    limit: '30kb'
-}));
-
-// LAB 7: Configure user sessions.
+// Session configuration
 app.use(session({
     name: 'skillnexa.sid',
     secret: process.env.SESSION_SECRET || 'development-only-change-this-secret',
@@ -47,98 +38,56 @@ app.use(session({
     }
 }));
 
-// Make the signed-in user available to every EJS page.
+// Global template variables
 app.use((req, res, next) => {
-    res.locals.currentUser =
-        req.session && req.session.user
-            ? req.session.user
-            : null;
-
+    res.locals.currentUser = req.session.user || null;
+    res.locals.currentPath = req.path;
+    res.locals.notice = req.query.notice || '';
     next();
 });
 
-// Connect the website routes.
-const indexRoutes = require('./routes/index');
+// Application routes
 app.use('/', indexRoutes);
-
-// Connect the API routes.
-const apiRoutes = require('./routes/api');
 app.use('/api', apiRoutes);
 
-// Display a useful message when a page fails.
-app.use((error, req, res, next) => {
-    console.error('Application error:', error);
+// 404 handler
+app.use((req, res) => {
+    if (req.path.startsWith('/api/')) {
+        return res.status(404).json({
+            error: 'API endpoint not found.'
+        });
+    }
 
-    if (res.headersSent) return next(error);
-
-    return res.status(500).render('error', {
-        title: 'Application error',
-        message: process.env.NODE_ENV === 'development'
-            ? error.message
-            : 'Please try again later.'
+    res.status(404).render('404', {
+        title: 'Page not found'
     });
 });
 
-// Start the server after connecting the databases.
-async function startServer() {
+// Error handler
+app.use((error, req, res, next) => {
+    console.error(error);
 
-    try {
-
-        // Verify PostgreSQL connection.
-        await db.one('SELECT 1');
-
-        console.log('PostgreSQL connection verified.');
-
-        // Connect to MongoDB Atlas.
-        const mongoDatabase = await connectMongo();
-
-        if (mongoDatabase) {
-            console.log('MongoDB connection verified.');
-        } else {
-            console.warn('MongoDB is not configured. Company reviews are unavailable.');
-        }
-
-        // Start the website.
-        const server = app.listen(PORT, () => {
-            console.log(`Skill Nexa running at http://localhost:${PORT}`);
-        });
-
-        // Close database connections when the server stops.
-        const shutdown = () => {
-
-            console.log('Shutting down Skill Nexa...');
-
-            server.close(async () => {
-
-                try {
-                    await closeMongo();
-                    await db.$pool.end();
-
-                } catch (error) {
-                    console.error('Shutdown error:', error.message);
-                }
-
-                process.exit(0);
-            });
-        };
-
-        process.on('SIGINT', shutdown);
-        process.on('SIGTERM', shutdown);
-
-    } catch (error) {
-
-        console.error(
-            'Unable to start Skill Nexa:',
-            error.message
-        );
-
-        process.exit(1);
+    if (res.headersSent) {
+        return next(error);
     }
-}
 
-// Run the server when app.js is executed directly.
-if (require.main === module) {
-    startServer();
-}
+    const status = error.status || 500;
 
+    if (req.path.startsWith('/api/')) {
+        return res.status(status).json({
+            error: status === 500
+                ? 'An unexpected server error occurred.'
+                : error.message
+        });
+    }
+
+    res.status(status).render('error', {
+        title: 'Something went wrong',
+        message: status === 500
+            ? 'An unexpected server error occurred. Please try again.'
+            : error.message
+    });
+});
+
+// Export Express app for testing
 module.exports = app;

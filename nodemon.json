@@ -1,14 +1,19 @@
 {
-  "watch": [
-    "app.js",
-    "routes/",
-    "controllers/",
-    "models/",
-    "middleware/",
-    "config/",
-    "utils/",
-    "views/"
-  ],
-  "ext": "js,ejs,json",
-  "ignore": ["public/", "node_modules/"]
+    "watch": [
+        "server.js",
+        "app.js",
+        "routes/",
+        "controllers/",
+        "models/",
+        "middleware/",
+        "config/",
+        "utils/",
+        "views/"
+    ],
+    "ext": "js,ejs,json",
+    "ignore": [
+        "public/",
+        "coverage/"
+    ],
+    "exec": "node server.js"
 }
