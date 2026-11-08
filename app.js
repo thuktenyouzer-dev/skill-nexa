@@ -23,7 +23,17 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.urlencoded({ extended: false, limit: '30kb' }));
 app.use(express.json({ limit: '30kb' }));
+// Handle requests where no body was parsed
+app.use((req, res, next) => {
+    if (!req.body) {
+        console.warn(
+            `[BODY WARNING] ${req.method} ${req.path}: no parsed request body`
+        );
+        req.body = {};
+    }
 
+    next();
+});
 // Session configuration
 app.use(session({
     name: 'skillnexa.sid',
