@@ -18,7 +18,7 @@ async function startServer() {
         console.log('MongoDB connection verified.');
 
         // Start Express server
-        const server = app.listen(PORT, () => {
+        const server = app.listen(PORT, '0.0.0.0', () => {
             console.log(
                 `Skill Nexa running at ${process.env.APP_URL || `http://localhost:${PORT}`}`
             );
